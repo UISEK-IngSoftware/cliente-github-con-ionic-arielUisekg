@@ -1,9 +1,20 @@
-import { IonContent, IonHeader, IonList, IonPage, IonTitle, IonToolbar } from '@ionic/react';
-
+import { IonContent, IonHeader, IonList, IonPage, IonTitle, IonToolbar, useIonViewDidEnter } from '@ionic/react';
+import React from 'react';
+import { useState } from 'react';
 import './Tab1.css';
 import RepoItem from '../components/RepoItem';
-
+import { RepositoryItem } from '../interfaces/RepositoryItem';
+import { fetchRepositories } from '../services/GithubService';
 const Tab1: React.FC = () => {
+  const[repos,SetRepos]=React.useState<RepositoryItem>([]);
+  const loadRepos= async()=>{
+    const reposData= await fetchRepositories();
+    SetRepos(reposData);
+  };
+  useIonViewDidEnter(()=>{
+    console.log("IownViewDidEnter - Cargando Repositorios")
+    loadRepos();
+  });
   return (
     <IonPage>
       <IonHeader>
@@ -18,20 +29,11 @@ const Tab1: React.FC = () => {
           </IonToolbar>
         </IonHeader>
         <IonList>
+        {repos.map((repos, index)=>
           <RepoItem 
-            name="android-project"
-            imageurl="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Android_robot.svg/1022px-Android_robot.svg.png" 
-            /> 
-            
-          <RepoItem 
-            name="iOS-project"
-            imageurl="https://logowik.com/content/uploads/images/ios1780.logowik.com.webp" 
-            /> 
-            
-          <RepoItem 
-            name="Ionic-project"
-            imageurl="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNPrhw75mJwZtTzvv7szTCJy7s43ulyWuXJQ&s" 
-            />
+          key={index} name={repos.name} 
+          imageurl={repos.imageurl!}
+          />)}
 
         </IonList>
 
