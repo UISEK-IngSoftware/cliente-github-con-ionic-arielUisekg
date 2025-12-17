@@ -6,7 +6,7 @@ import RepoItem from '../components/RepoItem';
 import { RepositoryItem } from '../interfaces/RepositoryItem';
 import { fetchRepositories } from '../services/GithubService';
 const Tab1: React.FC = () => {
-  const[repos,SetRepos]=React.useState<RepositoryItem>([]);
+  const[repos,SetRepos]=React.useState<RepositoryItem[]>([]);
   const loadRepos= async()=>{
     const reposData= await fetchRepositories();
     SetRepos(reposData);
@@ -31,8 +31,8 @@ const Tab1: React.FC = () => {
         <IonList>
         {repos.map((repos, index)=>
           <RepoItem 
-          key={index} name={repos.name} 
-          imageurl={repos.imageurl!}
+          key={index}
+          repo={repos}
           />)}
 
         </IonList>

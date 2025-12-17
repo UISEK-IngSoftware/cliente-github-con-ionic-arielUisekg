@@ -1,52 +1,54 @@
-// ...existing code...
-import React from 'react';
-import {
-  IonPage,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonContent,
-  IonCard,
-  IonCardHeader,
-  IonCardSubtitle,
-  IonCardTitle,
-  IonCardContent
-} from '@ionic/react';
+import React, { useEffect, useState } from 'react';
+import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle } from '@ionic/react';
+import { getUserInfo } from '../services/GithubService';
+
 import './Tab3.css';
+import { UserInfo } from '../interfaces/Userinfo';
+
 
 const Tab3: React.FC = () => {
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+
+  const loadUserInfo = async () => {
+    try {
+      const info = await getUserInfo();
+      setUserInfo(info);
+    } catch (err) {
+      console.error('Error cargando información de usuario', err);
+    }
+  };
+
+  useEffect(() => {
+    loadUserInfo();
+  }, []);
+
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Perfil de Usuario</IonTitle>
+          <IonTitle>Perfil de usuario</IonTitle>
         </IonToolbar>
       </IonHeader>
-
       <IonContent fullscreen>
         <IonHeader collapse="condense">
           <IonToolbar>
-            <IonTitle size="large">Perfil de Usuario</IonTitle>
+            <IonTitle size="large">Tab 3</IonTitle>
           </IonToolbar>
         </IonHeader>
+        <IonCard>
+          <img
+            alt={userInfo?.login ?? 'avatar'}
+            src={userInfo?.avatar_url ?? 'https://via.placeholder.com/150'}
+            style={{ width: 120, height: 120, borderRadius: 8, display: 'block', margin: '16px auto' }}
+          />
+          <IonCardHeader>
+            <IonCardTitle>{userInfo?.name ?? userInfo?.login ?? 'Usuario'}</IonCardTitle>
+            <IonCardSubtitle>{userInfo?.login ?? '—'}</IonCardSubtitle>
+          </IonCardHeader>
 
-        <div style={{ padding: 12 }}>
-          <IonCard>
-            <img
-              alt="cover"
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQf2sHR4EfEvaQcrvdQzN4V1w9It8JQgV0qNQ&s"
-              style={{ width: '100%', height: 220, objectFit: 'cover' }}
-            />
-            <IonCardHeader>
-              <IonCardTitle>Ariel Garcés</IonCardTitle>
-              <IonCardSubtitle>@arielUisekg</IonCardSubtitle>
-            </IonCardHeader>
+          <IonCardContent>{userInfo?.bio ?? 'Sin biografía'}</IonCardContent>
+        </IonCard>
 
-            <IonCardContent>
-              Estudiante de Ingeniería Informática
-            </IonCardContent>
-          </IonCard>
-        </div>
       </IonContent>
     </IonPage>
   );
