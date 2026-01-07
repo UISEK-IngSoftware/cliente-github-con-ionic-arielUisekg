@@ -45,46 +45,62 @@ import '@ionic/react/css/palettes/dark.system.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import AuthService from './services/AuthService';
+import Login from './pages/Login';
 
 setupIonicReact();
-const App: React.FC = () => (
-  <IonApp>
+const App: React.FC = () => {
+  const isAuthenticated=AuthService.isAuthenticated();
+  return(<IonApp>
     <IonReactRouter>
-      <IonTabs>
-        <IonRouterOutlet>
-          <Route exact path="/repositorio">
-            <Tab1 />
-          </Route>
-          <Route exact path="/crear-repo">
-            <Tab2 />
-          </Route>
-          <Route exact path="/perfil">
-            <Tab3 />
-          </Route>
-          <Route exact path="/">
-            <Redirect to="/repositorio" />
-          </Route>
-        </IonRouterOutlet>
 
-        <IonTabBar slot="bottom">
-          <IonTabButton tab="repositorio" href="/repositorio">
-            <IonIcon icon={logoGithub} />
-            <IonLabel>Repositorio</IonLabel>
-          </IonTabButton>
+      <IonRouterOutlet>
+        <Route exact path="/login">
+        <Login />
+        </Route>
+        <Route>
+        {isAuthenticated ? (
+        <IonTabs>
+          <IonRouterOutlet>
+            <Route exact path="/repositorio">
+              <Tab1 />
+            </Route>
+            <Route exact path="/crear-repo">
+              <Tab2 />
+            </Route>
+            <Route exact path="/perfil">
+              <Tab3 />
+            </Route>
+            <Route exact path="/">
+              <Redirect to="/repositorio" />
+            </Route>
+          </IonRouterOutlet>
 
-          <IonTabButton tab="crear-repo" href="/crear-repo">
-            <IonIcon icon={addCircle} />
-            <IonLabel>Crear Repo</IonLabel>
-          </IonTabButton>
+          <IonTabBar slot="bottom">
+            <IonTabButton tab="repositorio" href="/repositorio">
+              <IonIcon icon={logoGithub} />
+              <IonLabel>Repositorio</IonLabel>
+            </IonTabButton>
 
-          <IonTabButton tab="perfil" href="/perfil">
-            <IonIcon icon={personCircle} />
-            <IonLabel>Perfil</IonLabel>
-          </IonTabButton>
-        </IonTabBar>
-      </IonTabs>
+            <IonTabButton tab="crear-repo" href="/crear-repo">
+              <IonIcon icon={addCircle} />
+              <IonLabel>Crear Repo</IonLabel>
+            </IonTabButton>
+
+            <IonTabButton tab="perfil" href="/perfil">
+              <IonIcon icon={personCircle} />
+              <IonLabel>Perfil</IonLabel>
+            </IonTabButton>
+          </IonTabBar>
+        </IonTabs>
+        ) : (
+          <Redirect to="/login" />
+        )}
+        </Route>
+      </IonRouterOutlet>
     </IonReactRouter>
   </IonApp>
-);
+  );
+};
 
 export default App;
