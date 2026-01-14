@@ -1,13 +1,12 @@
-import { IonButton, IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonInput, IonTextarea } from '@ionic/react';
+import { IonButton, IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonInput, IonTextarea, IonList, IonItem, IonLabel, useIonToast } from '@ionic/react';
 import './Tab2.css';
-import { useHistory } from 'react-router-dom';
 import { RepositoryItem } from '../interfaces/RepositoryItem';
 import { useState } from 'react';
 import { createRepository } from '../services/GithubService';
 
 const Tab2: React.FC = () => {
 
-  const history = useHistory();
+  const [present] = useIonToast();
   const [repoFormData, setRepoFormData] = useState<RepositoryItem>({
     name: '',
     description: '',
@@ -24,59 +23,78 @@ const Tab2: React.FC = () => {
     setRepoFormData((prev) => ({ ...prev, description: value ?? '' }));
   };
 
-  const saveRepository = () => {
+  const saveRepository = async () => {
     if (repoFormData.name.trim() === '') {
-      alert('El nombre del repositorio es obligatorio.');
+      present({
+        message: 'El nombre del repositorio es obligatorio.',
+        duration: 2000,
+        color: 'warning'
+      });
       return;
     }
-    createRepository(repoFormData)
-      .then(() => {
-        history.push('/tab1');
-      }).catch(() => {
-        alert('Hubo un error al crear el repositorio. Por favor, inténtalo de nuevo.');
-      });
+
+    try {
+      await createRepository(repoFormData);
+        present({
+          message: 'Repositorio creado correctamente.',
+          duration: 2000,
+          color: 'success'
+        });
+        // Limpiamos el formulario después de crear, sin navegar
+        setRepoFormData({
+          name: '',
+          description: '',
+          imageurl: null,
+          owner: null,
+          language: null,
+        });
+    } catch (error) {
+        console.error(error);
+        present({
+          message: 'Hubo un error al guardar el repositorio. Por favor, inténtalo de nuevo.',
+          duration: 3000,
+          color: 'danger'
+        });
+    }
   };
 
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Formulario de Repositorio</IonTitle>
+          <IonTitle>Crear Repositorio</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen>
+      <IonContent fullscreen className="ion-padding">
         <IonHeader collapse="condense">
           <IonToolbar>
-            <IonTitle size="large">Formulario de Repositorio</IonTitle>
+            <IonTitle size="large">Crear</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <div className="form-container">
-          <IonInput
-            label="Nombre del repositorio"
-            labelPlacement="floating"
-            fill="outline"
-            placeholder="android-project"
-            className="form-field"
-            value={repoFormData.name}
-            onIonChange={(e) => setRepoName(e.detail.value as string | null)}
-          />
+        <IonList>
+            <IonItem>
+              <IonLabel position="floating">Nombre del repositorio</IonLabel>
+              <IonInput
+                placeholder="android-project"
+                value={repoFormData.name}
+                onIonChange={(e) => setRepoName(e.detail.value as string | null)}
+              />
+            </IonItem>
 
-          <IonTextarea
-            label="Descripción del Repositorio"
-            labelPlacement="floating"
-            fill="outline"
-            placeholder="Este es un Repositorio de Android"
-            className="form-field"
-            rows={6}
-            value={repoFormData.description ?? ''}
-            onIonChange={(e) => setRepoDescription(e.detail.value as string | null)}
-          />
+            <IonItem>
+              <IonLabel position="floating">Descripción del Repositorio</IonLabel>
+              <IonTextarea
+                placeholder="Este es un Repositorio de Android"
+                rows={6}
+                value={repoFormData.description ?? ''}
+                onIonChange={(e) => setRepoDescription(e.detail.value as string | null)}
+              />
+            </IonItem>
+        </IonList>
 
-          <IonButton expand="block" className="form-field" onClick={saveRepository}>
-            Guardar
-          </IonButton>
-
-        </div>
+        <IonButton expand="block" onClick={saveRepository} style={{ marginTop: '1rem' }}>
+          Guardar
+        </IonButton>
       </IonContent>
     </IonPage>
   );

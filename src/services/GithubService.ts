@@ -28,13 +28,16 @@ export const fetchRepositories = async (): Promise<RepositoryItem[]> => {
                 sort: "created",
                 direction: "desc",
                 affiliation: "owner",
+                t: new Date().getTime() // Evitar caché
             }
         });
 
         const repositories: RepositoryItem[] = response.data.map((repo: any) => ({
+            id: repo.id,
             name: repo.name,
             description: repo.description ? repo.description : null,
             imageurl: repo.owner ? repo.owner.avatar_url : null,
+            html_url: repo.html_url,
             owner: repo.owner ? repo.owner.login : null,
             language: repo.language ? repo.language : null,
         }));
@@ -54,6 +57,36 @@ export const createRepository = async (repo: RepositoryItem): Promise<void> => {
         
     } catch (error) {
         console.error("Ocurrió un error al crear el repositorio:", error);
+        throw error;
+    }
+};
+
+export const editRepository = async (owner: string, repoName: string, data: Partial<RepositoryItem>): Promise<RepositoryItem> => {
+    try {
+        // Usamos PATCH como lo indica la API de GitHub para actualizaciones parciales.
+        const response = await githubApi.patch(`/repos/${owner}/${repoName}`, data);
+        const repo = response.data;
+        return {
+            id: repo.id,
+            name: repo.name,
+            description: repo.description ? repo.description : null,
+            imageurl: repo.owner ? repo.owner.avatar_url : null,
+            html_url: repo.html_url,
+            owner: repo.owner ? repo.owner.login : null,
+            language: repo.language ? repo.language : null,
+        };
+    } catch (error: any) {
+        console.error(`Ocurrió un error al editar el repositorio ${owner}/${repoName}:`, error);
+        throw error;
+    }
+};
+
+export const deleteRepository = async (owner: string, repoName: string): Promise<void> => {
+    try {
+        await githubApi.delete(`/repos/${owner}/${repoName}`);
+    } catch (error: any) {
+        console.error(`Ocurrió un error al eliminar el repositorio ${owner}/${repoName}:`, error);
+        throw error;
     }
 };
 

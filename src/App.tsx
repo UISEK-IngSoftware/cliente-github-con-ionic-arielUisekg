@@ -14,6 +14,7 @@ import { Route, Redirect } from 'react-router-dom';
 import Tab1 from './pages/Tab1';
 import Tab2 from './pages/Tab2';
 import Tab3 from './pages/Tab3';
+import EditRepo from './pages/EditRepo';
 import { logoGithub, addCircle, personCircle } from 'ionicons/icons';
 
 /* Core CSS required for Ionic components to work properly */
@@ -58,7 +59,12 @@ const App: React.FC = () => {
         <Route exact path="/login">
         <Login />
         </Route>
-        <Route>
+
+        {/* Ruta para la página de edición, que no tiene la barra de pestañas */}
+        <Route path="/edit-repo" component={EditRepo} exact={true} />
+
+        {/* Rutas que sí muestran la barra de pestañas */}
+        <Route path="/(repositorio|crear-repo|perfil)">
         {isAuthenticated ? (
         <IonTabs>
           <IonRouterOutlet>
@@ -70,9 +76,6 @@ const App: React.FC = () => {
             </Route>
             <Route exact path="/perfil">
               <Tab3 />
-            </Route>
-            <Route exact path="/">
-              <Redirect to="/repositorio" />
             </Route>
           </IonRouterOutlet>
 
@@ -96,6 +99,10 @@ const App: React.FC = () => {
         ) : (
           <Redirect to="/login" />
         )}
+        </Route>
+
+        <Route exact path="/">
+          <Redirect to="/repositorio" />
         </Route>
       </IonRouterOutlet>
     </IonReactRouter>
