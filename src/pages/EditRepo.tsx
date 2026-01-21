@@ -53,10 +53,10 @@ const EditRepo: React.FC = () => {
         color: 'success'
       });
 
-      // Disparamos un evento para que la lista sepa que debe recargarse
+    
       window.dispatchEvent(new CustomEvent('repo-updated'));
       
-      // Quitamos el foco y volvemos atrás
+  
       (document.activeElement as HTMLElement)?.blur();
       history.goBack(); 
       

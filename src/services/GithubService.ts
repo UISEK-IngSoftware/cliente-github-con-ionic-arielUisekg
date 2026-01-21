@@ -63,7 +63,6 @@ export const createRepository = async (repo: RepositoryItem): Promise<void> => {
 
 export const editRepository = async (owner: string, repoName: string, data: Partial<RepositoryItem>): Promise<RepositoryItem> => {
     try {
-        // Usamos PATCH como lo indica la API de GitHub para actualizaciones parciales.
         const response = await githubApi.patch(`/repos/${owner}/${repoName}`, data);
         const repo = response.data;
         return {

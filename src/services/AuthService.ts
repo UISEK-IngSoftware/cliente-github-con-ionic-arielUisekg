@@ -1,13 +1,29 @@
+import axios from 'axios';
+
 const TOKEN_KEY = 'github_auth_token';
 const USERNAME_KEY = 'github_auth_username';
+const GITHUB_API_URL = import.meta.env.VITE_API_URL || 'https://api.github.com';
 
-class AuthService{ 
-    login(username: string, token: string){
-        if(username && token){
-            this.logout();
-            localStorage.setItem(USERNAME_KEY, username);
-            localStorage.setItem(TOKEN_KEY, token);
-            return true;
+class AuthService{
+    async login(username: string, token: string): Promise<boolean> {
+        if (!username || !token) {
+            return false;
+        }
+        try {
+            // Validate token by making a test request
+            const response = await axios.get(`${GITHUB_API_URL}/user`, {
+                headers: {
+                    Authorization: `token ${token}`,
+                },
+            });
+            if (response.status === 200 && response.data.login === username) {
+                this.logout();
+                localStorage.setItem(USERNAME_KEY, username);
+                localStorage.setItem(TOKEN_KEY, token);
+                return true;
+            }
+        } catch (error) {
+            console.error('Token validation failed:', error);
         }
         return false;
     }

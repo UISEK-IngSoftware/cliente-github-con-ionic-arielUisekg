@@ -21,19 +21,23 @@ const Login: React.FC = () => {
     const [token, setToken] = useState('');
     const [error, setError] = useState('');
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         if (!username || !token) {
             setError('Por favor, ingresa tu usuario y token de GitHub.');
             return;
         }
-    const success = AuthService.login(username, token);
-    if(success){
-        window.location.href = '/tab1';
-    } else {
-        setError('Error de autenticación. Verifica tus credenciales.');
-    }
+        try {
+            const success = await AuthService.login(username, token);
+            if (success) {
+                window.location.href = '/repositorio';
+            } else {
+                setError('Error de autenticación. Verifica tus credenciales.');
+            }
+        } catch {
+            setError('Error de conexión. Inténtalo de nuevo.');
+        }
     };
 
     return (

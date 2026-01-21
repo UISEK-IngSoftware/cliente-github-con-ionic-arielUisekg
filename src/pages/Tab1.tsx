@@ -32,7 +32,7 @@ const Tab1: React.FC = () => {
 
     window.addEventListener('repo-updated', handleRepoUpdate);
     return () => window.removeEventListener('repo-updated', handleRepoUpdate);
-  }, []); // El array vacío asegura que esto se ejecute solo una vez (al montar/desmontar)
+  }, []); 
 
   const handleEdit = (repo: RepositoryItem) => {
     // Quitar el foco del botón presionado antes de navegar para evitar el warning de aria-hidden
