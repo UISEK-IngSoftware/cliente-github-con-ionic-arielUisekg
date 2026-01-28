@@ -7,16 +7,20 @@ import { RepositoryItem } from '../interfaces/RepositoryItem';
 import { fetchRepositories, deleteRepository } from '../services/GithubService';
 import { useHistory } from 'react-router';
 import { add } from 'ionicons/icons';
-
+import LoadingSpinner from '../components/LoadingSpinner';
 const Tab1: React.FC = () => {
+  const [loading, setLoading] = useState(false);
   const[repos,SetRepos]=React.useState<RepositoryItem[]>([]);
   const [showAlert, setShowAlert] = useState(false);
   const [repoToDelete, setRepoToDelete] = useState<RepositoryItem | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const history = useHistory();
 
   const loadRepos= async()=>{
+    setLoading(true)
     const reposData= await fetchRepositories();
     SetRepos(reposData);
+    setLoading(false);
   };
 
   useIonViewDidEnter(()=>{
@@ -50,8 +54,13 @@ const Tab1: React.FC = () => {
 
   const handleDelete = async () => {
     if (repoToDelete && repoToDelete.owner) {
-      await deleteRepository(repoToDelete.owner, repoToDelete.name);
-      SetRepos(repos.filter(r => r.id !== repoToDelete.id));
+      setDeleteLoading(true);
+      try {
+        await deleteRepository(repoToDelete.owner, repoToDelete.name);
+        SetRepos(repos.filter(r => r.id !== repoToDelete.id));
+      } finally {
+        setDeleteLoading(false);
+      }
     }
     setShowAlert(false);
     setRepoToDelete(null);
@@ -103,6 +112,9 @@ const Tab1: React.FC = () => {
           ]}
         />
 
+
+        <LoadingSpinner isOpen={loading} />
+        <LoadingSpinner isOpen={deleteLoading} />
       </IonContent>
     </IonPage>
   );

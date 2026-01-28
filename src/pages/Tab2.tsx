@@ -3,10 +3,12 @@ import './Tab2.css';
 import { RepositoryItem } from '../interfaces/RepositoryItem';
 import { useState } from 'react';
 import { createRepository } from '../services/GithubService';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const Tab2: React.FC = () => {
 
   const [present] = useIonToast();
+  const [loading, setLoading] = useState(false);
   const [repoFormData, setRepoFormData] = useState<RepositoryItem>({
     name: '',
     description: '',
@@ -33,6 +35,7 @@ const Tab2: React.FC = () => {
       return;
     }
 
+    setLoading(true);
     try {
       await createRepository(repoFormData);
         present({
@@ -55,6 +58,8 @@ const Tab2: React.FC = () => {
           duration: 3000,
           color: 'danger'
         });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -77,7 +82,7 @@ const Tab2: React.FC = () => {
               <IonInput
                 placeholder="android-project"
                 value={repoFormData.name}
-                onIonChange={(e) => setRepoName(e.detail.value as string | null)}
+                onIonInput={(e) => setRepoName(e.detail.value as string | null)}
               />
             </IonItem>
 
@@ -87,14 +92,16 @@ const Tab2: React.FC = () => {
                 placeholder="Este es un Repositorio de Android"
                 rows={6}
                 value={repoFormData.description ?? ''}
-                onIonChange={(e) => setRepoDescription(e.detail.value as string | null)}
+                onIonInput={(e) => setRepoDescription(e.detail.value as string | null)}
               />
             </IonItem>
         </IonList>
 
-        <IonButton expand="block" onClick={saveRepository} style={{ marginTop: '1rem' }}>
+        <IonButton expand="block" onClick={saveRepository} style={{ marginTop: '1rem' }} disabled={loading}>
           Guardar
         </IonButton>
+
+        <LoadingSpinner isOpen={loading} />
       </IonContent>
     </IonPage>
   );

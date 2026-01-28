@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
-import { 
-  IonButton, 
-  IonContent, 
-  IonHeader, 
-  IonPage, 
-  IonTitle, 
-  IonToolbar, 
-  IonInput, 
-  IonTextarea, 
-  useIonViewDidEnter, 
-  IonList, 
-  IonItem, 
-  IonLabel, 
-  useIonToast, 
+import {
+  IonButton,
+  IonContent,
+  IonHeader,
+  IonPage,
+  IonTitle,
+  IonToolbar,
+  IonInput,
+  IonTextarea,
+  useIonViewDidEnter,
+  IonList,
+  IonItem,
+  IonLabel,
+  useIonToast,
   IonText,
   IonButtons,
   IonBackButton
@@ -20,15 +20,17 @@ import {
 import { useHistory, useLocation } from 'react-router-dom';
 import { RepositoryItem } from '../interfaces/RepositoryItem';
 import { editRepository } from '../services/GithubService';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const EditRepo: React.FC = () => {
   const history = useHistory();
   const [present] = useIonToast();
   const location = useLocation<{ repoToEdit: RepositoryItem }>();
-  
+
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [owner, setOwner] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useIonViewDidEnter(() => {
     if (location.state?.repoToEdit) {
@@ -45,6 +47,7 @@ const EditRepo: React.FC = () => {
   const handleSave = async () => {
     if (!owner) return;
 
+    setLoading(true);
     try {
       await editRepository(owner, name, { name, description });
       present({
@@ -53,13 +56,13 @@ const EditRepo: React.FC = () => {
         color: 'success'
       });
 
-    
+
       window.dispatchEvent(new CustomEvent('repo-updated'));
-      
-  
+
+
       (document.activeElement as HTMLElement)?.blur();
-      history.goBack(); 
-      
+      history.goBack();
+
     } catch (error) {
       console.error(error);
       present({
@@ -67,6 +70,8 @@ const EditRepo: React.FC = () => {
         duration: 3000,
         color: 'danger'
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -105,9 +110,11 @@ const EditRepo: React.FC = () => {
             </IonItem>
         </IonList>
 
-        <IonButton expand="block" onClick={handleSave} style={{ marginTop: '1rem' }}>
+        <IonButton expand="block" onClick={handleSave} style={{ marginTop: '1rem' }} disabled={loading}>
           Actualizar
         </IonButton>
+
+        <LoadingSpinner isOpen={loading} />
       </IonContent>
     </IonPage>
   );

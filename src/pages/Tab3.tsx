@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonButton, IonIcon, useIonViewDidEnter } from '@ionic/react';
 import { getUserInfo } from '../services/GithubService';
 
@@ -7,16 +7,21 @@ import { UserInfo } from '../interfaces/UserInfo';
 import { logOutOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router';
 import AuthService from '../services/AuthService';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const Tab3: React.FC = () => {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [loading, setLoading] = useState(false);
   const history=useHistory();
   const loadUserInfo = async () => {
+    setLoading(true);
     try {
       const info = await getUserInfo();
       setUserInfo(info);
     } catch (err) {
       console.error('Error cargando información de usuario', err);
+    } finally {
+      setLoading(false);
     }
   };
     useIonViewDidEnter(() => {
@@ -58,6 +63,7 @@ const Tab3: React.FC = () => {
           Cerrar sesión
         </IonButton>
 
+        <LoadingSpinner isOpen={loading} />
       </IonContent>
     </IonPage>
   );
